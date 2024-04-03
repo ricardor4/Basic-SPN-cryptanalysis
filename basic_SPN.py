@@ -139,7 +139,7 @@ if __name__ == "__main__":
     
     # Produce a CSV of plaintext, key value pairs for cryptanalysis 
     fileName = 'testData/' + k[0:20] + '.dat'
-    nVals = 1
+    nVals = 5000
     fd_w = open(fileName,"w+")
     print ('Running basic SPN cipher with key K = {:}'.format(k))
     
