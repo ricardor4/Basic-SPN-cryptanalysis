@@ -25,7 +25,8 @@ def apply_sbox(state, sbox:dict):
     return subStates[0]|subStates[1]<<4|subStates[2]<<8|subStates[3]<<12
     
 
-# (2) Permutation. Applied bit-wise
+# (2) Permutation. Applied bit-wise 
+# OBS: 0-indexed, Heys uses 1-indexed
 pbox = {0:0, 1:4, 2:8, 3:12, 4:1, 5:5, 6:9, 7:13, 8:2, 9:6, 10:10, 11:14, 12:3, 13:7, 14:11, 15:15}
 
 # (3) Key mixing: bitwise XOR between round subkey and data block input to round
