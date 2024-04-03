@@ -11,14 +11,14 @@ import random
 import hashlib
 
 blockSize = 16
-verboseState = False
+verboseState = True
 
 # (1) Substitution: 4x4 bijective, one sbox used for all 4 sub-blocks of size 4. Nibble wise
 sbox =     {0:0xE, 1:0x4, 2:0xD, 3:0x1, 4:0x2, 5:0xF, 6:0xB, 7:0x8, 8:0x3, 9:0xA, 0xA:0x6, 0xB:0xC, 0xC:0x5, 0xD:0x9, 0xE:0x0, 0xF:0x7} #key:value
 sbox_inv = {0xE:0, 0x4:1, 0xD:2, 0x1:3, 0x2:4, 0xF:5, 0xB:6, 0x8:7, 0x3:8, 0xA:9, 0x6:0xA, 0xC:0xB, 0x5:0xC, 0x9:0xD, 0x0:0xE, 0x7:0xF}
 
 # Apply sbox (1) to a 16 bit state and return the result
-def apply_sbox(state, sbox):
+def apply_sbox(state, sbox:dict):
     subStates = [state&0x000f, (state&0x00f0)>>4, (state&0x0f00)>>8, (state&0xf000)>>12]
     for idx,subState in enumerate(subStates):
         subStates[idx] = sbox[subState]
@@ -35,9 +35,11 @@ pbox = {0:0, 1:4, 2:8, 3:12, 4:1, 5:5, 6:9, 7:13, 8:2, 9:6, 10:10, 11:14, 12:3, 
 def keyGeneration():
     k = hashlib.sha1( hex(random.getrandbits(128)).encode('utf-8') ).hexdigest()[2:2+20]
     return k
+# k is hex of 20 digits, that is 80 bits
+
 
 # Simple SPN Cipher encrypt function
-def encrypt(pt, k):
+def encrypt(pt, k:str):
     state = pt
     if verboseState: print('**pt = {:04x}**'.format(state))
     
@@ -46,14 +48,14 @@ def encrypt(pt, k):
     #First three rounds of sinple SPN cipher
     for roundN in range(0,3):
     
-        if verboseState: print(roundN, end = ' ')
+        if verboseState: print(f"Round {roundN}")
         #XOR state with round key (3, subkeys 1,..,4)
         state = state^subKeys[roundN]
-        if verboseState: print (hex(state), end = ' ')
+        if verboseState: print ('After key addition:',hex(state))
         
         #Break state into nibbles, perform sbox on each nibble, write to state (1)
         state = apply_sbox(state,sbox)
-        if verboseState: print (hex(state), end = ' ')
+        if verboseState: print("After Sboxes", hex(state))
         
         #Permute the state bitwise (2)
         state_temp = 0      
@@ -61,15 +63,19 @@ def encrypt(pt, k):
             if(state & (1 << bitIdx)):
                 state_temp |= (1 << pbox[bitIdx])
         state = state_temp
-        if verboseState: print (hex(state))
+        if verboseState: print ("After LL",hex(state))
     
     # Final round of SPN cipher (k4, sbox, s5)
     state = state^subKeys[-2] #penultimate subkey (key 4) mixing
-    if verboseState: print (str(3), hex(state), end = ' ')   
+    if verboseState: 
+        print ("Round: 3",)
+        print("After key addition:",hex(state))
+
+
     state = apply_sbox(state,sbox)
-    if verboseState: print (hex(state), end = ' ')
+    if verboseState:print("After Sboxes", hex(state))
     state = state^subKeys[-1] #Final subkey (key 5) mixing
-    if verboseState: print (hex(state)) 
+    if verboseState: print("After Key Whitening", hex(state))
     if verboseState: print('**ct = {:04x}**'.format(state))
     
     return state
@@ -121,12 +127,18 @@ def decrypt(ct, k):
 
 if __name__ == "__main__":
     
-    # Generate a randon key
+    # Generate a random key
+
     k = keyGeneration()
+
+
+
+    # Test the simple SPN cipher
+
     
     # Produce a CSV of plaintext, key value pairs for cryptanalysis 
     fileName = 'testData/' + k[0:20] + '.dat'
-    nVals = 10000
+    nVals = 1
     fd_w = open(fileName,"w+")
     print ('Running basic SPN cipher with key K = {:}'.format(k))
     
@@ -139,4 +151,3 @@ if __name__ == "__main__":
     print ('Simple SPN plaintext, ciphertext CSV written to ' + fileName) 
     print ('{:} values written.'.format(nVals))
     
-                 
