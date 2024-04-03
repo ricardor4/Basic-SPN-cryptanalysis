@@ -47,5 +47,4 @@ if __name__ == "__main__":
     # Generate a random key
     k = '0x1234567890abcdef'
     # now generate pairs of plaintexts and ciphertexts with XOR difference 0b0000 1011 0000 0000 under the key k
-    generate_pairs(5000, 2816, k)
-    
+    generate_pairs(5000, int('0000101100000000', 2), k)
