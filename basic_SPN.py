@@ -125,7 +125,6 @@ def decrypt(ct, k):
     if verboseState: print('**pt = {:04x}**'.format(state))     
      
     return state
-
 if __name__ == "__main__":
     
     # Generate a random key

@@ -32,14 +32,11 @@ def generate_xored_pairs(numbers:list[int], diff:int) -> list[int]:
 
     return result
 
-# Generate the pairs of plaintexts and store them in a file with the format: plaintext, plaintext XOR diff
-pairs = generate_xored_pairs(plaintexts, diff)
-'''
-file_path = 'testData/plaintexts.dat'
-with open(file_path, 'w') as file:
-    for i in range(0, len(pairs), 2):
-        file.write(f'{pairs[i]:04x}, {pairs[i+1]:04x}\n')
+# Generate the pairs of plaintexts-ciiphertexts
+key = 0x1234567890abcdef
+plaintexts = generate_xored_pairs(plaintexts, diff)
+print(plaintexts)
+ciphertexts = [encrypt(plaintext, key) for plaintext in plaintexts]
 
-'''
-for i in range(0, len(pairs), 2):
-    print(f'{pairs[i] ^ pairs[i+1]:016b}')
+# we want tuples of the form (plaintext, ciphertext)
+pairs_plaintext_ciphertext = [(plaintexts[i], ciphertexts[i]) for i in range(len(plaintexts))]
