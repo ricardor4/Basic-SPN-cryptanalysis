@@ -136,18 +136,14 @@ if __name__ == "__main__":
     # Test the simple SPN cipher
 
     
-    # Produce a CSV of plaintext, key value pairs for cryptanalysis 
+    # Produce a CSV of plaintext, key value pairs for cryptanalysis from the plaintexts on /testData/plaintexts.txt
     fileName = 'testData/' + k[0:20] + '.dat'
-    nVals = 5000
     fd_w = open(fileName,"w+")
     print ('Running basic SPN cipher with key K = {:}'.format(k))
-    
-    #fd_w.write('test')
-    for i in range(0, nVals):     
-        fd_w.write('{:04x}, {:04x}\n'.format(i, encrypt(i, k)))
-    
-    fd_w.close()
-    
-    print ('Simple SPN plaintext, ciphertext CSV written to ' + fileName) 
-    print ('{:} values written.'.format(nVals))
-    
+
+    with open("testData/plaintexts.txt", "r") as fd:
+        for line in fd:
+            pt = int(line)
+            ct = encrypt(pt, k)
+            fd_w.write(str(pt)+','+str(ct)+'\n')
+
